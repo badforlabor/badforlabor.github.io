@@ -5,6 +5,7 @@ tags: [test1]
 ---
 
 ![](../../../../img/head1.gif)
+![](/img/head1.gif)
 
 # 标题1
 ## 标题2
