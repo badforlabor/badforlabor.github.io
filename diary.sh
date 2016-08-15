@@ -1,6 +1,6 @@
 # diary.sh
 
-Month=201607
+Month=201608
 
 
 arg1="$1"
