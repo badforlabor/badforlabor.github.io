@@ -5,7 +5,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">{{ config.author }}</span>
+  <a href="mailto:badforlabor@foxmail.com">{{ config.author }}</a>
 </div>
 
 <div class="powered-by">
