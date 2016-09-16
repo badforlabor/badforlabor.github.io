@@ -1,0 +1,586 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="UE4," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="UE4使用Steamworks SDKSDK官网戳这里在官网上，SDK的信息很详细，登陆steam账号，下载SDK，之后，可以运行其中的例子，例子中提供了各种API的使用方法
+UE4接入Steam嘿嘿，UE4已经接入了steam，在Online系统中，叫OnlineSubsystemSteam官方已经给出了设置方式，详细在这里，还可以参考wiki调用方式很简单，比如获取steam的昵称123456">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ue4使用steam sdk">
+<meta property="og:url" content="http://yoursite.com/2016/09/16/ue4-steam/index.html">
+<meta property="og:site_name" content="三叔的游戏圈">
+<meta property="og:description" content="UE4使用Steamworks SDKSDK官网戳这里在官网上，SDK的信息很详细，登陆steam账号，下载SDK，之后，可以运行其中的例子，例子中提供了各种API的使用方法
+UE4接入Steam嘿嘿，UE4已经接入了steam，在Online系统中，叫OnlineSubsystemSteam官方已经给出了设置方式，详细在这里，还可以参考wiki调用方式很简单，比如获取steam的昵称123456">
+<meta property="og:updated_time" content="2016-09-16T14:06:30.084Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ue4使用steam sdk">
+<meta name="twitter:description" content="UE4使用Steamworks SDKSDK官网戳这里在官网上，SDK的信息很详细，登陆steam账号，下载SDK，之后，可以运行其中的例子，例子中提供了各种API的使用方法
+UE4接入Steam嘿嘿，UE4已经接入了steam，在Online系统中，叫OnlineSubsystemSteam官方已经给出了设置方式，详细在这里，还可以参考wiki调用方式很简单，比如获取steam的昵称123456">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> ue4使用steam sdk | 三叔的游戏圈 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">三叔的游戏圈</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-diary">
+          <a href="/diarys" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            行云流水
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                ue4使用steam sdk
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-16T21:41:26+08:00" content="2016-09-16">
+              2016-09-16
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="UE4使用Steamworks-SDK"><a href="#UE4使用Steamworks-SDK" class="headerlink" title="UE4使用Steamworks SDK"></a>UE4使用Steamworks SDK</h1><h3 id="SDK官网"><a href="#SDK官网" class="headerlink" title="SDK官网"></a>SDK官网</h3><p><a href="https://partner.steamgames.com/" target="_blank" rel="external">戳这里</a><br>在官网上，SDK的信息很详细，登陆steam账号，下载SDK，之后，可以运行其中的例子，例子中提供了各种API的使用方法</p>
+<h3 id="UE4接入Steam"><a href="#UE4接入Steam" class="headerlink" title="UE4接入Steam"></a>UE4接入Steam</h3><p>嘿嘿，UE4已经接入了steam，在Online系统中，叫OnlineSubsystemSteam<br>官方已经给出了设置方式，详细在<a href="https://docs.unrealengine.com/latest/INT/Programming/Online/Steam/index.html" target="_blank" rel="external">这里</a>，还可以参考<a href="https://wiki.unrealengine.com/Steam,_Using_the_Steam_SDK_During_Development" target="_blank" rel="external">wiki</a><br><br><br>调用方式很简单，比如获取steam的昵称<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">FString UMyBlueprintFunctionLibrary::GetMySteamName()</span><br><span class="line">&#123;</span><br><span class="line">	IOnlineSubsystem* mysteam = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);</span><br><span class="line">	<span class="keyword">if</span> (mysteam != <span class="literal">NULL</span> &amp;&amp; mysteam-&gt;GetIdentityInterface().IsValid())</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span> mysteam-&gt;GetIdentityInterface()-&gt;GetPlayerNickname(<span class="number">0</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> TEXT(<span class="string">""</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<p>不过，在editor模式下，有些问题，SubsystemSteam实例会创建失败，原因是这段代码搞得鬼<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> FOnlineSubsystemSteam::IsEnabled()</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (bSteamworksClientInitialized || bSteamworksGameServerInitialized)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Check the ini for disabling Steam</span></span><br><span class="line">	<span class="keyword">bool</span> bEnableSteam = <span class="literal">true</span>;</span><br><span class="line">	GConfig-&gt;GetBool(TEXT(<span class="string">"OnlineSubsystemSteam"</span>), TEXT(<span class="string">"bEnabled"</span>), bEnableSteam, GEngineIni);</span><br><span class="line">	<span class="keyword">if</span> (bEnableSteam)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">// Steam doesn't support running both the server and client on the same machine</span></span><br><span class="line">		bEnableSteam = !FParse::Param(FCommandLine::Get(),TEXT(<span class="string">"MultiprocessOSS"</span>));</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> UE_EDITOR</span></span><br><span class="line">		<span class="keyword">if</span> (bEnableSteam)</span><br><span class="line">		&#123;</span><br><span class="line">			bEnableSteam = IsRunningDedicatedServer() || IsRunningGame();</span><br><span class="line">		&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> bEnableSteam;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>居然多加了如下这个判断，真的搞不明白<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> UE_EDITOR</span></span><br><span class="line">		<span class="keyword">if</span> (bEnableSteam)</span><br><span class="line">		&#123;</span><br><span class="line">			bEnableSteam = IsRunningDedicatedServer() || IsRunningGame();</span><br><span class="line">		&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure></p>
+<p>所以，没办法，自己重新把OnlineSubsystemSteam代码复制粘贴了一份，叫做MySteam。大部分都没动，只是简单的把几个类改名为<em>MySteam</em>，比如USteamNetConnection改名为UMySteamNetConnection，默认是的STEAM_SUBSYSTEM改名为MY_STEAM。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/UE4/" rel="tag">#UE4</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/07/ue4-csv/" rel="next" title="ue4-csv">
+                <i class="fa fa-chevron-left"></i> ue4-csv
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="bad labor" />
+          <p class="site-author-name" itemprop="name">bad labor</p>
+          <p class="site-description motion-element" itemprop="description">123</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#UE4使用Steamworks-SDK"><span class="nav-number">1.</span> <span class="nav-text">UE4使用Steamworks SDK</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SDK官网"><span class="nav-number">1.0.1.</span> <span class="nav-text">SDK官网</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UE4接入Steam"><span class="nav-number">1.0.2.</span> <span class="nav-text">UE4接入Steam</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <a href="mailto:badforlabor@foxmail.com">bad labor</a>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>

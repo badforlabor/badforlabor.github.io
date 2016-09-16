@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Game, Develop, UE4, Unity, Bad Labor" />
 
 
 
@@ -263,6 +263,504 @@
             
               
                 
+                <a class="post-title-link" href="/2016/09/16/ue4-steam/" itemprop="url">
+                  ue4使用steam sdk
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-16T21:41:26+08:00" content="2016-09-16">
+              2016-09-16
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="UE4使用Steamworks-SDK"><a href="#UE4使用Steamworks-SDK" class="headerlink" title="UE4使用Steamworks SDK"></a>UE4使用Steamworks SDK</h1><h3 id="SDK官网"><a href="#SDK官网" class="headerlink" title="SDK官网"></a>SDK官网</h3><p><a href="https://partner.steamgames.com/" target="_blank" rel="external">戳这里</a><br>在官网上，SDK的信息很详细，登陆steam账号，下载SDK，之后，可以运行其中的例子，例子中提供了各种API的使用方法</p>
+<h3 id="UE4接入Steam"><a href="#UE4接入Steam" class="headerlink" title="UE4接入Steam"></a>UE4接入Steam</h3><p>嘿嘿，UE4已经接入了steam，在Online系统中，叫OnlineSubsystemSteam<br>官方已经给出了设置方式，详细在<a href="https://docs.unrealengine.com/latest/INT/Programming/Online/Steam/index.html" target="_blank" rel="external">这里</a>，还可以参考<a href="https://wiki.unrealengine.com/Steam,_Using_the_Steam_SDK_During_Development" target="_blank" rel="external">wiki</a><br><br><br>调用方式很简单，比如获取steam的昵称<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">FString UMyBlueprintFunctionLibrary::GetMySteamName()</span><br><span class="line">&#123;</span><br><span class="line">	IOnlineSubsystem* mysteam = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);</span><br><span class="line">	<span class="keyword">if</span> (mysteam != <span class="literal">NULL</span> &amp;&amp; mysteam-&gt;GetIdentityInterface().IsValid())</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span> mysteam-&gt;GetIdentityInterface()-&gt;GetPlayerNickname(<span class="number">0</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> TEXT(<span class="string">""</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<p>不过，在editor模式下，有些问题，SubsystemSteam实例会创建失败，原因是这段代码搞得鬼<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> FOnlineSubsystemSteam::IsEnabled()</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (bSteamworksClientInitialized || bSteamworksGameServerInitialized)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Check the ini for disabling Steam</span></span><br><span class="line">	<span class="keyword">bool</span> bEnableSteam = <span class="literal">true</span>;</span><br><span class="line">	GConfig-&gt;GetBool(TEXT(<span class="string">"OnlineSubsystemSteam"</span>), TEXT(<span class="string">"bEnabled"</span>), bEnableSteam, GEngineIni);</span><br><span class="line">	<span class="keyword">if</span> (bEnableSteam)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">// Steam doesn't support running both the server and client on the same machine</span></span><br><span class="line">		bEnableSteam = !FParse::Param(FCommandLine::Get(),TEXT(<span class="string">"MultiprocessOSS"</span>));</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> UE_EDITOR</span></span><br><span class="line">		<span class="keyword">if</span> (bEnableSteam)</span><br><span class="line">		&#123;</span><br><span class="line">			bEnableSteam = IsRunningDedicatedServer() || IsRunningGame();</span><br><span class="line">		&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> bEnableSteam;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>居然多加了如下这个判断，真的搞不明白<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> UE_EDITOR</span></span><br><span class="line">		<span class="keyword">if</span> (bEnableSteam)</span><br><span class="line">		&#123;</span><br><span class="line">			bEnableSteam = IsRunningDedicatedServer() || IsRunningGame();</span><br><span class="line">		&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure></p>
+<p>所以，没办法，自己重新把OnlineSubsystemSteam代码复制粘贴了一份，叫做MySteam。大部分都没动，只是简单的把几个类改名为<em>MySteam</em>，比如USteamNetConnection改名为UMySteamNetConnection，默认是的STEAM_SUBSYSTEM改名为MY_STEAM。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/09/07/ue4-csv/" itemprop="url">
+                  ue4-csv
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-07T16:46:18+08:00" content="2016-09-07">
+              2016-09-07
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="UE4加载CSV的各种方法"><a href="#UE4加载CSV的各种方法" class="headerlink" title="UE4加载CSV的各种方法"></a>UE4加载CSV的各种方法</h1><h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>当然，加载csv的第一步，要先建立一个与csv表对应的结构体，在导入csv表的时候会用到。<br>该结构体，<strong>必须继承自FTableRowBase</strong>，比如：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">USTRUCT()</span><br><span class="line"><span class="keyword">struct</span> FTestDataRow : <span class="keyword">public</span> FTableRowBase</span><br><span class="line">&#123;</span><br><span class="line">	GENERATED_USTRUCT_BODY()</span><br><span class="line"></span><br><span class="line">	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Test)</span><br><span class="line">		<span class="keyword">float</span> time;</span><br><span class="line">	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Test)</span><br><span class="line">		<span class="keyword">int</span> scene_id;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 这里没加“EditAnywhere”，这个变量就无法在editor中编辑，嘿嘿。</span></span><br><span class="line">	UPROPERTY()</span><br><span class="line">		<span class="keyword">float</span> alpha;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p><br><br><br></p>
+<p>有了这个结构体之后，就能建立一下csv表，当然，按照UE4的约定，<strong>csv表的结构必须与对应的结构体一致</strong>，比如，创建的test1.csv的内容是：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// test1.csv</span></span><br><span class="line">id,time,scene_id,alpha</span><br><span class="line"><span class="number">1</span>,<span class="number">0.1</span>,<span class="number">1</span>,<span class="number">0</span></span><br><span class="line"><span class="number">2</span>,<span class="number">0.5</span>,<span class="number">3</span>,<span class="number">0</span></span><br><span class="line"><span class="number">3</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><br></p>
+<h2 id="读取"><a href="#读取" class="headerlink" title="读取"></a>读取</h2><p>然后，就可以在UE4中导入这个csv表啦。</p>
+<h3 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h3><p>在C++中，访问csv表，很简单，把UDataTable加载出来即可，如下所示：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 加载csv，并且显示第一行数据</span></span><br><span class="line">UDataTable* csv = LoadObject&lt;UDataTable&gt;(<span class="literal">NULL</span>, TEXT(<span class="string">"DataTable'/Game/csv/test1.test1'"</span>));</span><br><span class="line"><span class="keyword">if</span> (csv != <span class="literal">NULL</span> &amp;&amp; csv-&gt;GetRowNames().Num() &gt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// 获取id=1的那行的数据</span></span><br><span class="line">	FTestDataRow* row = csv-&gt;FindRow&lt;FTestDataRow&gt;(TEXT(<span class="string">"1"</span>), TEXT(<span class="string">""</span>));</span><br><span class="line">	<span class="keyword">if</span> (row != <span class="literal">NULL</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		Debug(FString::Printf(TEXT(<span class="string">"csv, row time="</span>), row-&gt;time));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h3 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h3><p>在BP中，读取csv，依然也很简单，如图：</p>
+<p><img src="/img/ue4/2016-09-07_171527.png" alt=""></p>
+<p><br></p>
+<h3 id="方法三"><a href="#方法三" class="headerlink" title="方法三"></a>方法三</h3><p>在C++中，直接读取csv文件，方法，当然也很简单，因为UE4提供了这个功能，<strong>核心是调用函数：UDataTable::CreateTableFromCSVString</strong><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 动态读取csv文件，不过，这个只能在Editor模式运行，如果需要在发布版中运行，那么自己新建一个类</span></span><br><span class="line">FString FilePath = FPaths::ConvertRelativePathToFull(FPaths::GameDir()) + FString::Printf(TEXT(<span class="string">"csv/test1.csv"</span>));</span><br><span class="line">FString Data;</span><br><span class="line"><span class="keyword">if</span> (FFileHelper::LoadFileToString(Data, *FilePath))</span><br><span class="line">&#123;</span><br><span class="line">	UDataTable* DataTable = NewObject&lt;UDataTable&gt;(GetTransientPackage(), FName(TEXT(<span class="string">"CSV_Test"</span>)));</span><br><span class="line">	DataTable-&gt;RowStruct = FTestDataRow::StaticStruct();</span><br><span class="line">	DataTable-&gt;CreateTableFromCSVString(Data);</span><br><span class="line">	Debug(FString::Printf(TEXT(<span class="string">"%d"</span>), DataTable-&gt;GetRowNames().Num()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>想起一下用UT2004的年代，csv相关的函数都是自己写的，Unreal并没有提供太多的帮助。这次用UE4，着实方便了很多啊！</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/09/06/ue4-anim-blend/" itemprop="url">
+                  ue4-anim-blend
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-06T11:24:29+08:00" content="2016-09-06">
+              2016-09-06
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="UE4的动画状态机"><a href="#UE4的动画状态机" class="headerlink" title="UE4的动画状态机"></a>UE4的动画状态机</h3><p><br></p>
+<p>状态机这种东西，还是很好用的，之前在Unity中就体验过，确实方便。</p>
+<p>今天，做了一个小功能，用到了UE4的，也很简单，参考下UE4官方文档，一会儿就搞定了，<font color="#ff0000">详细请戳<a href="https://docs.unrealengine.com/latest/CHN/Gameplay/HowTo/CharacterMovement/index.html" target="_blank" rel="external">官方文档链接</a> </font></p>
+<p>看，效果就是这样的<br><img src="/img/ue4/2016-09-06_171429.png" alt=""></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/09/05/ue4-loadobject/" itemprop="url">
+                  ue4-loadobject
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-05T12:06:51+08:00" content="2016-09-05">
+              2016-09-05
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="UE4-C-加载对象"><a href="#UE4-C-加载对象" class="headerlink" title="UE4 C++加载对象"></a>UE4 C++加载对象</h3><p>开发功能的时候，经常会用到一些对象，比如Material、Texture，如何动态加载呢？</p>
+<p>核心函数是：StaticLoadObject</p>
+<p>不过，有几种封装。</p>
+<p>第一种，只能在构造函数中运行。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这个只能在构造函数中执行</span></span><br><span class="line"><span class="keyword">static</span> ConstructorHelpers::FObjectFinder&lt;UTexture&gt;</span><br><span class="line">	GameObjectLookupDataTable_BP(TEXT(<span class="string">"Texture2D'/Game/t1.t1'"</span>));</span><br><span class="line">UTexture* txture = GameObjectLookupDataTable_BP.Object;</span><br></pre></td></tr></table></figure>
+<p>第二种，在任何地方都能调用，不过，尽量别在构造函数中调用，因为，被加载的内容，有可能被垃圾回收掉。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 名字，在UE4Editor中，按Ctrl+c，然后在notepad中，按Ctrl+v，就可以查看了。</span></span><br><span class="line">UTexture* txture = (UTexture*)StaticLoadObject(UTexture::StaticClass(), <span class="literal">NULL</span>, TEXT(<span class="string">"Texture2D'/Game/t1.t1'"</span>), <span class="literal">NULL</span>, LOAD_None, <span class="literal">NULL</span>, <span class="literal">true</span>);</span><br><span class="line">txture = (UTexture*)StaticLoadObject(UTexture::StaticClass(), <span class="literal">NULL</span>, TEXT(<span class="string">"Texture2D'/Game/t1.t1'"</span>));</span><br><span class="line"></span><br><span class="line">txture = LoadObject&lt;UTexture&gt;(<span class="literal">NULL</span>, TEXT(<span class="string">"Texture2D'/Game/t1.t1'"</span>));</span><br></pre></td></tr></table></figure>
+<p>注意， 动态加载的内容，是可以被垃圾回收掉的，如果想一直保留在内存中，可以这样：（不过，不建议这样调用，还是让UnrealEngine自动管理好）<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">UTexture* txture = (UTexture*)StaticLoadObject(UTexture::StaticClass(), <span class="literal">NULL</span>, TEXT(<span class="string">"Texture2D'/Game/t1.t1'"</span>), <span class="literal">NULL</span>, LOAD_None, <span class="literal">NULL</span>, <span class="literal">true</span>);</span><br><span class="line">txture-&gt;AddToRoot();</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/08/23/cpp-primer/" itemprop="url">
+                  C++基础语法
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-23T10:24:09+08:00" content="2016-08-23">
+              2016-08-23
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="C-基础语法"><a href="#C-基础语法" class="headerlink" title="C++基础语法"></a>C++基础语法</h3><p>说来有意思，前些年天天写C++，非常擅长。这才几年，忘光啦，又没有笔记可翻，所以只能重新再把C++Primer翻一遍，把一些基本的定义记录在这里，当成手册，以后方便查阅</p>
+<h2 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h2><p>&nbsp;&nbsp;&nbsp;&nbsp;声明方法：int a[3]; // 必须带长度<br>&nbsp;&nbsp;&nbsp;&nbsp;声明和赋值：int a[] = {1,2,3};<br>&nbsp;&nbsp;&nbsp;&nbsp;动态数组：int* a = new int[3];<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;需要动态释放：delete [] a;<br><strong>错误的写法：</strong><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//int c[];	// 编译错误，没有指定数组大小</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> elen = <span class="number">5</span>;</span><br><span class="line"><span class="comment">//int e[elen];	// 编译错误，数组大小不确定，所以编译不过</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 正确的写法</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> flen = <span class="number">3</span>;</span><br><span class="line"><span class="keyword">int</span> f[flen];</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/07/05/ue4-shortkey/" itemprop="url">
                   UE4快捷键
                 </a>
@@ -432,121 +930,6 @@
 </code></pre><p><img src="/img/git-bash-tips-pic2.png" alt=""><br>    这个shell脚步的好处是，当用hexo写日志的时候，会自动使用notepad++打开日志文件</p>
 
           
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/06/25/hello-world/" itemprop="url">
-                  Hello World
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-06-25T00:39:12+08:00" content="2016-06-25">
-              2016-06-25
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/分类1/" itemprop="url" rel="index">
-                    <span itemprop="name">分类1</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.<br>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/06/25/hello-world/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
         
       
     </div>
@@ -794,7 +1177,7 @@
       <section class="site-overview sidebar-panel  sidebar-panel-active ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="/images/sh1.jpg"
+               src="/images/avatar.png"
                alt="bad labor" />
           <p class="site-author-name" itemprop="name">bad labor</p>
           <p class="site-description motion-element" itemprop="description">123</p>
@@ -802,18 +1185,11 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">9</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
-          
-            <div class="site-state-item site-state-categories">
-              <a href="/categories">
-                <span class="site-state-item-count">1</span>
-                <span class="site-state-item-name">分类</span>
-              </a>
-            </div>
           
 
           
@@ -860,7 +1236,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">bad labor</span>
+  <a href="mailto:badforlabor@foxmail.com">bad labor</a>
 </div>
 
 <div class="powered-by">
